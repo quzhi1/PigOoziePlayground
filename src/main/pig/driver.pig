@@ -1,0 +1,2 @@
+loadDriver = LOAD '/user/zhiqu/grid_getting_started/drivers.csv' using PigStorage(',') as (driverId:chararray, name:chararray, ssn:chararray, location:chararray, certified:chararray, wage_plan:chararray);
+DUMP loadDriver;
