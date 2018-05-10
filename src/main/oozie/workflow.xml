@@ -1,0 +1,64 @@
+<workflow-app name="feedVespaAthenz" xmlns="uri:oozie:workflow:0.5">
+    <credentials>
+        <credential name='athensauth' type='athens'>
+            <property>
+                <name>athens.domain</name>
+                <value>canvass.vespa.qa</value>
+            </property>
+            <property>
+                <name>athens.role</name>
+                <value>vespa.vespa.hosting.res_group.canvass-search-qa.writer</value>
+            </property>
+            <property>
+                <name>athens.user.domain</name>
+                <value>home</value>
+            </property>
+            <property>
+                <name>athens.min.expiry</name>
+                <value>10800</value>
+            </property>
+        </credential>
+    </credentials>
+    <start to="pig-619a"/>
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <action name="pig-619a">
+        <pig>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapreduce.job.acl-view-job</name>
+                    <value>*</value>
+                </property>
+                <property>
+                    <name>vespa.feed.proxy.host</name>
+                    <value>httpproxy-prod.blue.ygrid.yahoo.com</value>
+                </property>
+                <property>
+                    <name>vespa.feed.proxy.port</name>
+                    <value>4080</value>
+                </property>
+                <property>
+                    <name>vespa.feed.ssl</name>
+                    <value>true</value>
+                </property>
+                <property>
+                    <name>vespa.feed.defaultport</name>
+                    <value>4443</value>
+                </property>
+                <property>
+                    <name>oozie.action.sharelib.for.pig</name>
+                    <value>pig_current</value>
+                </property>
+            </configuration>
+            <script>${wf:appPath()}/feedVespaAthenz.pig</script>
+            <file>/user/zhiqu/vespa-hadoop.jar#vespa-hadoop.jar</file>
+            <archive>/user/zhiqu/vespa-hadoop.jar#vespa-hadoop.jar</archive>
+        </pig>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    <end name="End"/>
+</workflow-app>

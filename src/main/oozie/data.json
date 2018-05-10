@@ -1,0 +1,14 @@
+[
+  {
+    "remove": "id:title:title::1",
+    "fields": {
+      "title": "Title 1"
+    }
+  },
+  {
+    "remove": "id:title:title::2",
+    "fields": {
+      "title": "Title 2"
+    }
+  }
+]

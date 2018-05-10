@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="vespa-hadoop-auth-test">
+
+    <credentials>
+        <credential name='athensauth' type='athens'>
+            <property>
+                <name>athens.domain</name>
+                <value>${athensDomain}</value>
+            </property>
+            <property>
+                <name>athens.role</name>
+                <value>${athensRole}</value>
+            </property>
+            <property>
+                <name>athens.user.domain</name>
+                <value>${athensUserDomain}</value>
+            </property>
+            <property>
+                <name>athens.min.expiry</name>
+                <value>10800</value>
+            </property>
+        </credential>
+    </credentials>
+
+    <start to="feed"/>
+
+    <action name="feed" cred="athensauth">
+        <pig>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+                <property>
+                    <name>mapred.compress.map.output</name>
+                    <value>true</value>
+                </property>
+                <property>
+                    <name>oozie.launcher.mapreduce.job.acl-view-job</name>
+                    <value>*</value>
+                </property>
+                <property>
+                    <name>oozie.action.sharelib.for.pig</name>
+                    <value>pig_current</value>
+                </property>
+                <property>
+                    <name>vespa.feed.proxy.host</name>
+                    <value>${vespaProxyHost}</value>
+                </property>
+                <property>
+                    <name>vespa.feed.proxy.port</name>
+                    <value>${vespaProxyPort}</value>
+                </property>
+                <property>
+                    <name>vespa.feed.auth.method</name>
+                    <value>athens</value>
+                </property>
+                <property>
+                    <name>vespa.feed.auth.athens.user.domain</name>
+                    <value>${athensUserDomain}</value>
+                </property>
+                <property>
+                    <name>vespa.feed.auth.athens.user</name>
+                    <value>${athensUser}</value>
+                </property>
+                <property>
+                    <name>vespa.feed.auth.athens.role</name>
+                    <value>${athensRole}</value>
+                </property>
+            </configuration>
+            <script>feed.pig</script>
+            <param>DATA=${feedData}</param>
+            <param>ENDPOINT=${endpoint}</param>
+            <archive>lib/vespa-hadoop.jar#vespa-hadoop.jar</archive>
+        </pig>
+        <ok to="end"/>
+        <error to="fail"/>
+    </action>
+
+    <kill name="fail">
+        <message>Feed failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <end name="end"/>
+
+</workflow-app>
