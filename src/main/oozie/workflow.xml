@@ -11,7 +11,7 @@
             </property>
             <property>
                 <name>athens.user.domain</name>
-                <value>home</value>
+                <value>user</value>
             </property>
             <property>
                 <name>athens.min.expiry</name>
@@ -19,11 +19,11 @@
             </property>
         </credential>
     </credentials>
-    <start to="pig-619a"/>
+    <start to="vespa-feed"/>
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
-    <action name="pig-619a">
+    <action name="vespa-feed" cred="athensauth">
         <pig>
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
@@ -31,6 +31,14 @@
                 <property>
                     <name>mapreduce.job.acl-view-job</name>
                     <value>*</value>
+                </property>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>default</value>
+                </property>
+                <property>
+                    <name>mapred.compress.map.output</name>
+                    <value>true</value>
                 </property>
                 <property>
                     <name>vespa.feed.proxy.host</name>
@@ -51,6 +59,18 @@
                 <property>
                     <name>oozie.action.sharelib.for.pig</name>
                     <value>pig_current</value>
+                </property>
+                <property>
+                    <name>vespa.feed.auth.method</name>
+                    <value>athens</value>
+                </property>
+                <property>
+                    <name>vespa.feed.auth.athens.user.domain</name>
+                    <value>user</value>
+                </property>
+                <property>
+                    <name>vespa.feed.auth.athens.role</name>
+                    <value>vespa.vespa.hosting.res_group.canvass-search-qa.writer</value>
                 </property>
             </configuration>
             <script>${wf:appPath()}/feedVespaAthenz.pig</script>
